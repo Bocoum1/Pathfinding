@@ -1,0 +1,101 @@
+pour construire la matrice faire attention au cas ou les lignes n'ont pas la meme taille sur le fichier
+
+// pourqoui M[i][j] fonctionne pas mais M[i,j] oui
+pour un tuple on peut faire voisins.size()?
+
+!!!!!!!!!! A 0 et quand ça deborde mon modele renvoie quand meme des valeurs 
+
+//Gerer le cas ou s w peut etre majuscule ou miniscule.
+//Pour les dictionnaires si la clé n'existe pas on peut utiliser la fonction get pour retourner une valeur par defaut 
+valeur = get(d, "cinq", 0)  # Retourne 0 si "cinq" n'est pas dans le dictionnaire
+println(valeur).
+
+***Dans ce projet on utilisera les dictionnaires en plus des set pour:
+Enregistrer les distances : associés à chaque noeud sa distance minimale depuis la source.
+Conserver les predecesseurs: Stocker le noeud parent pour chaque noeud visité, ce qui permettra de reconstruire le chemin une fois la destination atteinte .
+Stocker d'autres infos(peut etre) comme des états ou des poids. 
+
+******** L'ordre d'evaluation peut ameliorer la performance du BFS*********
+
+
+gerer les depassements: function algoBFS(fname::String, D::Tuple{Int,Int}, A::Tuple{Int,Int})
+    grid = lire_map(fname)
+    rows, cols = size(grid)
+
+    # Vérifier si les positions D et A sont valides
+    if !(1 ≤ D[1] ≤ rows && 1 ≤ D[2] ≤ cols)
+        error("Position de départ D = $D hors des limites de la carte ($rows x $cols).")
+    end
+    if !(1 ≤ A[1] ≤ rows && 1 ≤ A[2] ≤ cols)
+        error("Position d'arrivée A = $A hors des limites de la carte ($rows x $cols).")
+    end
+    if grid[D...] == '@' || grid[A...] == '@'
+        error("D ou A est un obstacle '@' ! Impossible de commencer ou d’arriver ici.")
+    end
+affichage aussi comme ça: 🛤️ Chemin : (1,2) → (1,3) → (2,3) → (3,3) → (3,4)
+
+
+
+# BFS algorithm in Python
+
+
+import collections
+
+# BFS algorithm
+def bfs(graph, root):
+
+    visited, queue = set(), collections.deque([root])
+    visited.add(root)
+
+    while queue:
+
+        # Dequeue a vertex from queue
+        vertex = queue.popleft()
+        print(str(vertex) + " ", end="")
+
+        # If not visited, mark it as visited, and
+        # enqueue it
+        for neighbour in graph[vertex]:
+            if neighbour not in visited:
+                visited.add(neighbour)
+                queue.append(neighbour)
+
+
+if __name__ == '__main__':
+    graph = {0: [1, 2], 1: [2], 2: [3], 3: [1, 2]}
+    print("Following is Breadth First Traversal: ")
+    bfs(graph, 0)
+Dijkstra:
+Une file de priorité permet d'explorer d'abord les chemins les moins couteux.
+push!(visited,current)
+ for nb in get_neighbors(grid, current)
+            cost = cout_deplacement(grid[nb[1], nb[2]])
+                          new_dist = dist[current] + cost
+            if new_dist < dist[nb]
+                dist[nb] = new_dist
+                parent[nb] = current
+                enqueue!(pq, nb, new_dist)
+            end
+        end
+    end
+            Marquage comme visité :
+        On ajoute la case current dans l’ensemble visited pour signifier que son coût est maintenant fixé.
+
+        Itération sur les voisins :
+        Pour chaque voisin accessible (déterminé par ta fonction get_neighbors), on fait :
+            On calcule le coût pour aller de current à ce voisin grâce à cout_deplacement.
+            new_dist correspond au coût cumulé pour atteindre ce voisin en passant par current (soit le coût pour atteindre current plus le coût du mouvement vers le voisin).
+            Mise à jour de la distance :
+            Si new_dist est inférieur au coût actuellement enregistré pour ce voisin, cela signifie qu’on a trouvé un chemin moins coûteux.
+            On met donc à jour dist[nb], on enregistre current comme parent de ce voisin, et on l’ajoute dans la PriorityQueue avec la nouvelle priorité (new_dist).
+            En BFS, on explore chaque nœud exactement une fois grâce à un set "visited" qui empêche de retraiter un même nœud. Dans Dijkstra, un nœud peut être inséré plusieurs fois dans la PriorityQueue avec des coûts différents, car on peut découvrir plusieurs chemins pour y arriver. Cependant, dès qu'un nœud est extrait et marqué comme visité (c'est-à-dire que son coût minimal est définitivement fixé), il ne sera plus traité, même s'il apparaît plusieurs fois dans la file.
+    Mise à jour des distances :
+    Lorsqu'on trouve un chemin plus court vers un nœud déjà rencontré, on met à jour sa distance et on l'ajoute à la file de priorité avec cette nouvelle valeur. Ainsi, le même nœud peut être extrait plusieurs fois, mais généralement, lorsqu'il est extrait, on vérifie si la distance associée est toujours la plus courte. Si ce n'est pas le cas, on l'ignore.
+
+    Comparaison avec BFS :
+    Dans un BFS classique sur un graphe non pondéré, on marque un nœud comme visité dès qu'on l'ajoute à la file. Cela garantit que chaque nœud est examiné une seule fois. En revanche, Dijkstra travaille avec des poids et doit parfois réexaminer un nœud pour mettre à jour la meilleure distance trouvée.
+
+En résumé, la nature des mises à jour dans Dijkstra implique que le même nœud peut être traité à plusieurs reprises, alors qu'en BFS, une fois qu'un nœud est visité, il n'est plus réexaminé.
+
+
+
