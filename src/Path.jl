@@ -30,7 +30,7 @@ function lire_map(fname::String)
     return M
 end
 #Fonction qui calcul le cout de deplacement
-# Les couts de S et W sont 5 et 8 et pour tout autre caractere(à l'exception de '@') on  prend un cout de 1
+# Les couts de S et W sont 5 et 8 et pour le . ona 1 tout autre caractere est consideré comme étant un obstacle
 function cout_deplacement(cell::Char)
     if cell == 'S'
         return 5
@@ -49,7 +49,7 @@ function get_neighbors(M::Matrix{Char}, position::Tuple{Int,Int})
       nl,nc=l+dl, c+dc
       if nl >= 1 && nl <= size(M,1) && nc >= 1 && nc <= size(M,2)
       #On verifie que la case est accessible(Donc on ne va ajouter que les cases accessibles dans la liste des voisins)
-         if M[nl,nc]!='@'
+         if M[nl,nc] =='.' || M[nl,nc]=='S' || M[nl,nc]=='W'
             push!(voisins,(nl,nc))
          end
      end
