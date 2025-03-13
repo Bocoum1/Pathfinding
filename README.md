@@ -10,6 +10,7 @@ Ce projet implémente quatre algorithmes de recherche de chemin sur une grille(c
 .)A*
 
 .)Glouton
+
 La carte est représentée par une matrice de caractères. Les obstacles sont indiqués par '@' et les cases traversables par d'autres caractères (par exemple, '-',S ou W).
 
 ***********************Structure du depot:*******************************************
