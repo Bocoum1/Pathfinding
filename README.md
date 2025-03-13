@@ -15,7 +15,7 @@ La carte est représentée par une matrice de caractères. Les obstacles sont in
 
 ***********************Structure du depot:*******************************************
 
-**src/**
+**src/**::
 
 Contient le code source avec:
 *)lire_map(fname::String) qui lit le fichier de carte en ignorant l'en-ête et construit la matrice.
