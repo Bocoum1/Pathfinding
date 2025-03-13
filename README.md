@@ -38,7 +38,7 @@ Datastructures(Pour la file de priorité(PriorityQueue)**
 ****************************************Installation et Execution*****************************************
 
 
-Cloner le dépôt
+Cloner le dépôt:
 
 Dans un terminal, exécuter :
 
