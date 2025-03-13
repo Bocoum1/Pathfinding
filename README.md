@@ -1,4 +1,5 @@
 ****PROJET DE Pathfinding en Julia*****
+
 Ce projet implémente quatre algorithmes de recherche de chemin sur une grille(carte) lue depuis des fichiers texte :
 .)Breadth-First Search(BFS)
 .)Dijkstra
@@ -8,6 +9,7 @@ La carte est représentée par une matrice de caractères. Les obstacles sont in
 
 ***********************Structure du depot:*******************************************
 **src/**
+
 Contient le code source avec:
 *)lire_map(fname::String) qui lit le fichier de carte en ignorant l'en-ête et construit la matrice.
 *)cout_deplacement(cell::Char) qui definit le cout de passage selon chaque caractere
@@ -21,6 +23,7 @@ Contient les fichiers de données (cartes) au format texte.
 Datastructures(Pour la file de priorité(PriorityQueue)**
 
 ****************************************Installation et Execution*****************************************
+
 Cloner le dépôt
 Dans un terminal, exécuter :
     git clone https://github.com/Bocoum1/Pathfinding.git
