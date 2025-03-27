@@ -267,3 +267,24 @@ function algoGlouton(fname::String, D::Tuple{Int,Int}, A::Tuple{Int,Int})
    println("Aucun chemin trouvé avec le Glouton")
    return []
 end
+
+#Calcul de f pour les 3 cas de  l'algorthme wA*
+
+function calcul_f(pos::Tuple{Int,Int}, gpos::Float64, A::Tuple{Int,Int}, mode::Int,w::Float64)
+    hpos = manhattan(pos, A)
+    if mode == 1 
+     #f(n) = w*g(n) + (1-w)*h(n), 0 <= w <=1
+     return w*gpos + (1 - w)*hpos
+    else
+     # mode=2 ou 3 : f(n) = g(n) + w*h(n), w >= 1
+     return gpos + w*hpos
+    end
+end
+
+#Une fonction w_dynamique pour avoir w dynamique pour le 3eme cas 
+# Ici je choisi de diminuer w en fonction du nombre d'états évaluées
+
+function w_dynamique(voisin::Tuple{Int,Int}, nb_eval::Int, w_init::Float64)
+    # Plus le nombre d'états augmente plus w diminue(et w >= 1 )
+    new_w= 1+(w_ini-1)*exp(-0.0001*nb_eval)
+end
