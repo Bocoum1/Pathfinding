@@ -286,7 +286,7 @@ end
 
 function w_dynamique(voisin::Tuple{Int,Int}, nb_eval::Int, w_init::Float64)
     # Plus le nombre d'états augmente plus w diminue(et w >= 1 )
-    new_w= 1+(w_ini-1)*exp(-0.0001*nb_eval)
+    new_w= 1+(w_init-1)*exp(-0.0001*nb_eval)
 end
 
 #L'algorithme A* Ponderé
