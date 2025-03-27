@@ -288,3 +288,83 @@ function w_dynamique(voisin::Tuple{Int,Int}, nb_eval::Int, w_init::Float64)
     # Plus le nombre d'états augmente plus w diminue(et w >= 1 )
     new_w= 1+(w_ini-1)*exp(-0.0001*nb_eval)
 end
+
+#L'algorithme A* Ponderé
+function algo_wAstar(fname::String,D::Tuple{Int,Int},A::Tuple{Int,Int};mode::Int, w::Float64)
+  
+    #Lecture de la carte  
+    grid = lire_map(fname)
+
+    #  g et f 
+    g = Dict{Tuple{Int,Int}, Float64}()
+    f = Dict{Tuple{Int,Int}, Float64}()
+
+    for i in 1:size(grid,1), j in 1:size(grid,2)
+        g[(i,j)] = Inf
+        f[(i,j)] = Inf
+    end
+
+    # Initialisation
+    g[D] = 0.0
+    # Calcul initial de f(D) selon la variante
+    f[D] = calcul_f(D, g[D], A; mode=mode, w=w)
+
+    # Dictionnaire pour suivre le parent de chaque position
+    parent = Dict{Tuple{Int,Int}, Tuple{Int,Int}}()
+
+    # PriorityQueue pour gérer l'ordre d'exploration (basé sur f)
+    pq = PriorityQueue{Tuple{Int,Int}, Float64}()
+    enqueue!(pq, D, f[D])
+
+    visited = Set{Tuple{Int,Int}}()
+    nb_evaluated = 0
+
+    # Boucle principale
+    while !isempty(pq)
+        current = dequeue!(pq)
+        nb_evaluated += 1
+
+        # Si on a atteint l'arrivée
+        if current == A
+            path = reconstruire_path(parent, D, A)
+            println("mode=$mode, w=$w (initial)")
+            println("Distance D->A ", g[A])
+            println("Number of states evaluated:",nb_evaluated )
+            print("Chemin : ")
+           return afficher_chemin(path)
+        end
+
+        push!(visited, current)
+
+        for voisin in get_neighbors(grid, current)
+            if voisin in visited
+                continue
+            end
+
+            # Si mode=3, on recalcule w dynamiquement
+            current_w = w
+            if mode == 3
+                current_w = w_dynamique(voisin, nb_evaluated, w)
+            end
+
+            # Calcul du coût pour atteindre 'voisin'
+            cost = cout_deplacement(grid[voisin[1], voisin[2]])
+            tentative_g = g[current] + cost
+
+            if tentative_g < g[voisin]
+                parent[voisin] = current
+                g[voisin] = tentative_g
+                f[voisin] = calcul_f(voisin, g[voisin], A; mode=mode, w=current_w)
+
+                # Mise à jour dans la PQ
+                if haskey(pq, voisin)
+                    delete!(pq, voisin)
+                end
+                enqueue!(pq, voisin, f[voisin])
+            end
+        end
+    end
+
+    println("Aucun chemin trouvé (mode=$mode, w=$w).")
+    return []
+end
