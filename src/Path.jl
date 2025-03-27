@@ -270,8 +270,8 @@ end
 
 #Calcul de f pour les 3 cas de  l'algorthme wA*
 
-function calcul_f(pos::Tuple{Int,Int}, gpos::Float64, A::Tuple{Int,Int}, mode::Int,w::Float64)
-    hpos = manhattan(pos, A)
+function calcul_f(pos::Tuple{Int,Int}, gpos::Float64, A::Tuple{Int,Int}; mode::Int,w::Float64)
+    hpos = heuristique(pos, A)
     if mode == 1 
      #f(n) = w*g(n) + (1-w)*h(n), 0 <= w <=1
      return w*gpos + (1 - w)*hpos
