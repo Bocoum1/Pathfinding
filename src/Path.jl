@@ -268,7 +268,7 @@ function algoGlouton(fname::String, D::Tuple{Int,Int}, A::Tuple{Int,Int})
    return []
 end
 
-#Calcul de f pour les 3 cas de  l'algorthme wA*
+#Calcul de f pour les 3 cas de  l'algorthme wA***************************************************************
 
 function calcul_f(pos::Tuple{Int,Int}, gpos::Float64, A::Tuple{Int,Int}; mode::Int,w::Float64)
     hpos = heuristique(pos, A)
@@ -281,7 +281,7 @@ function calcul_f(pos::Tuple{Int,Int}, gpos::Float64, A::Tuple{Int,Int}; mode::I
     end
 end
 
-#Une fonction w_dynamique pour avoir w dynamique pour le 3eme cas 
+#Une fonction w_dynamique pour avoir w dynamique pour le 3eme cas ***********************************************************
 # Ici je choisi de diminuer w en fonction du nombre d'états évaluées
 
 function w_dynamique(voisin::Tuple{Int,Int}, nb_eval::Int, w_init::Float64)
@@ -289,7 +289,7 @@ function w_dynamique(voisin::Tuple{Int,Int}, nb_eval::Int, w_init::Float64)
     new_w= 1+(w_init-1)*exp(-0.0001*nb_eval)
 end
 
-#L'algorithme A* Ponderé
+#L'algorithme A* Ponderé************************************************************************************
 function algo_wAstar(fname::String,D::Tuple{Int,Int},A::Tuple{Int,Int};mode::Int, w::Float64)
   
     #Lecture de la carte  
@@ -356,7 +356,7 @@ function algo_wAstar(fname::String,D::Tuple{Int,Int},A::Tuple{Int,Int};mode::Int
                 g[voisin] = tentative_g
                 f[voisin] = calcul_f(voisin, g[voisin], A; mode=mode, w=current_w)
 
-                # Mise à jour dans la PQ
+                # Mise à jour dans la file de Priorité
                 if haskey(pq, voisin)
                     delete!(pq, voisin)
                 end
