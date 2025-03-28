@@ -1,7 +1,7 @@
 ****PROJET DE Pathfinding en Julia*****
 
 
-Ce projet implémente quatre algorithmes de recherche de chemin sur une grille(carte) lue depuis des fichiers texte :
+Ce projet implémente quatre algorithmes de recherche de chemin sur une grille(carte) lue depuis des fichiers texte; plus la variante A* ponderé de l'algorithme A* :
 
 .)Breadth-First Search(BFS)
 
