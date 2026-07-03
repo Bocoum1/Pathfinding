@@ -1,80 +1,114 @@
-****PROJET DE Pathfinding en Julia*****
+# Pathfinding in Julia
 
+A Julia implementation of classical pathfinding algorithms on grid maps.
 
-Ce projet implémente quatre algorithmes de recherche de chemin sur une grille(carte) lue depuis des fichiers texte; plus la variante A* ponderé de l'algorithme A* :
+The project reads map files, models obstacles and terrain costs, then compares several search strategies from uninformed search to heuristic search.
 
-.)Breadth-First Search(BFS)
+## Implemented Algorithms
 
-.)Dijkstra
+- Breadth-First Search
+- Dijkstra
+- A*
+- Greedy Best-First Search
+- Weighted A*
 
-.)A*
+The implementation also includes utility functions for reading map files, computing movement costs, finding valid neighbors, reconstructing paths, and printing the resulting route.
 
-.)Glouton
+## Map Model
 
-La carte est représentée par une matrice de caractères. Les obstacles sont indiqués par '@' et les cases traversables par d'autres caractères (par exemple, '-',S ou W).
+Maps are loaded from text files in `dat/`. The reader skips the file header until it finds the `map` line, then builds a character matrix.
 
-***********************Structure du depot:*******************************************
+Supported terrain behavior:
 
-**src/**::
+- `@`: obstacle, not traversable
+- `.`: normal traversable cell, cost `1`
+- `S`: slower terrain, cost `5`
+- `W`: water-like terrain, cost `8`
 
-Contient le code source avec:
-*)lire_map(fname::String) qui lit le fichier de carte en ignorant l'en-ête et construit la matrice.
+Movement is 4-directional: up, down, left, and right.
 
-*)cout_deplacement(cell::Char) qui definit le cout de passage selon chaque caractere
+## Repository Structure
 
-*)get_neigbhors(M::Matrix{Char}, position::Tuple{Int,Int}) Qui renvoie la liste des voisins accessibles
+```text
+.
+├── dat/
+│   ├── Paris_2_1024.map
+│   ├── Sydney_2_512.map
+│   └── maze512-1-0.map
+└── src/
+    └── Path.jl
+```
 
-*)Les implémentations des algorithmes : algobfs, algoDijkstra, algoAstar, algoGlouton.
+## Requirements
 
-*)La fonction reconstruire_path qui remonte le chemin à partir du dictionnaire des parents
+- Julia
+- `DataStructures.jl`
 
-  ***dat/**
+Install the required package from the Julia REPL:
 
-Contient les fichiers de données (cartes) au format texte.
+```julia
+using Pkg
+Pkg.add("DataStructures")
+```
 
-****Packages Utilisés : **
-Datastructures(Pour la file de priorité(PriorityQueue)**
+## Usage
 
-****************************************Installation et Execution*****************************************
+Clone the repository:
 
+```bash
+git clone https://github.com/Bocoum1/Pathfinding.git
+cd Pathfinding
+```
 
-Cloner le dépôt:
+Open Julia and load the source file:
 
-Dans un terminal, exécuter :
+```julia
+include("src/Path.jl")
+```
 
-    git clone https://github.com/Bocoum1/Pathfinding.git
-    
-    cd Pathfinding
+Run an algorithm on one of the bundled maps:
 
-Dans le REPL de Julia, executer 
+```julia
+start = (333, 14)
+goal = (312, 15)
+map_file = "dat/maze512-1-0.map"
 
- using Pkg
+algobfs(map_file, start, goal)
+algoDijkstra(map_file, start, goal)
+algoAstar(map_file, start, goal)
+algoGlouton(map_file, start, goal)
+```
 
- Pkg.instantiate()
+Run Weighted A*:
 
-Puis executer les algorithmes
+```julia
+algo_wAstar(map_file, start, goal; mode=2, w=1.5)
+```
 
- include("src/Path.jl")
- 
- Puis, pour tester chaque algorithme
-# Exemple avec un fichier de carte dans le dossier dat/
+## Weighted A* Modes
 
- algobfs("dat/maze512-1-0.map",(333,14),(312,15))
- 
- algoDijkstra("dat/maze512-1-0.map",(333,14),(312,15))
- 
- algoAstar("dat/maze512-1-0.map",(333,14),(312,15))
- 
- algoGlouton("dat/maze512-1-0.map",(333,14),(312,15))
+The `algo_wAstar` function supports several weighting strategies through `mode`:
 
-*********Gestion des Obstacles*******
+- `mode=1`: weighted blend of path cost and heuristic
+- `mode=2`: `f(n) = g(n) + w * h(n)`
+- `mode=3`: dynamic weight that decreases as more states are evaluated
 
-Les obstacles sont marqués par '@' et ne sont pas accessibles.
+## Example Output
 
-La fonction cout_deplacement attribue des coûts spécifiques aux cases contenant 'S' (coût 5) et 'W' (coût 8), et un coût de 1 pour les autres cases traversables.
+Each algorithm prints:
 
+- the selected algorithm
+- the distance or path cost
+- the number of evaluated states
+- the reconstructed path as coordinates
 
+## Notes
 
-    
+This project is focused on algorithmic clarity rather than UI or visualization. A natural next step would be to add benchmark tables and path visualizations for the bundled maps.
 
+## Roadmap
 
+- Add benchmark results comparing evaluated states and path costs.
+- Add image-based path visualization.
+- Add tests for map parsing and path reconstruction.
+- Package the code as a small Julia module.
