@@ -31,6 +31,7 @@ Les déplacements se font dans 4 directions : haut, bas, gauche et droite.
 
 ```text
 .
+├── Project.toml
 ├── dat/
 │   ├── Paris_2_1024.map
 │   ├── Sydney_2_512.map
@@ -44,11 +45,12 @@ Les déplacements se font dans 4 directions : haut, bas, gauche et droite.
 - Julia
 - `DataStructures.jl`
 
-Installer le package nécessaire depuis le REPL Julia :
+Installer les dépendances du projet depuis le REPL Julia :
 
 ```julia
 using Pkg
-Pkg.add("DataStructures")
+Pkg.activate(".")
+Pkg.instantiate()
 ```
 
 ## Utilisation
@@ -63,6 +65,8 @@ cd Pathfinding
 Ouvrir Julia et charger le fichier source :
 
 ```julia
+using Pkg
+Pkg.activate(".")
 include("src/Path.jl")
 ```
 
@@ -101,6 +105,8 @@ Chaque algorithme affiche :
 - la distance ou le coût du chemin
 - le nombre d'états évalués
 - le chemin reconstruit sous forme de coordonnées
+
+Le code vérifie aussi que la carte contient bien une section `map` et que les positions de départ et d'arrivée sont dans la carte, sur des cases traversables.
 
 ## Notes
 

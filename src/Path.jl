@@ -1,44 +1,72 @@
-#BOCOUM AMADOU
+using DataStructures
+
+# BOCOUM AMADOU
 
 function lire_map(fname::String)
-    
-    lines=open(fname, "r") do file
+    lines = open(fname, "r") do file
         readlines(file)
     end
 
-    ind=findfirst(line->lowercase(strip(line))=="map",lines)
-     if ind==nothing
-        println("Erreur sur le fichier il est sans en-tete")
-     end
-    carte=lines[(ind+1):end]
+    ind = findfirst(line -> lowercase(strip(line)) == "map", lines)
+    if ind === nothing
+        throw(ArgumentError("Le fichier $fname ne contient pas de section `map`."))
+    end
 
-    n=length(carte)
+    carte = chomp.(lines[(ind + 1):end])
+    if isempty(carte)
+        throw(ArgumentError("Le fichier $fname ne contient aucune ligne de carte."))
+    end
+
+    n = length(carte)
     #Trouver la longueur maximale parmi toutes les lignes
-    m=maximum(length.(carte))
-    M=Matrix{Char}(undef, n,m)
+    m = maximum(length.(carte))
+    M = Matrix{Char}(undef, n,m)
     for i in 1:n
-        line=carte[i]
+        line = carte[i]
         for j in 1:m
-            if j<=length(line)
-                M[i,j]=line[j]
+            if j <= length(line)
+                M[i,j] = line[j]
             else
-                #Si la ligne est plus courte , on complete avec des espaces accessibles
-                M[i,j]= '-'
+                M[i,j] = '-'
             end
         end
     end
     return M
 end
+
+function case_traversable(cell::Char)
+    return cell == '.' || cell == 'S' || cell == 'W'
+end
+
 #Fonction qui calcul le cout de deplacement
-# Les couts de S et W sont 5 et 8 et pour le . ona 1 tout autre caractere est consideré comme étant un obstacle
+# Les couts de S et W sont 5 et 8 et pour le . on a 1. Tout autre caractere est considere comme un obstacle.
 function cout_deplacement(cell::Char)
     if cell == 'S'
         return 5
     elseif cell == 'W'
         return 8
+    elseif cell == '.'
+        return 1
     else
-        return 1 
+        return Inf
     end
+end
+
+function valider_position(M::Matrix{Char}, position::Tuple{Int,Int}, label::String)
+    l, c = position
+    if l < 1 || l > size(M, 1) || c < 1 || c > size(M, 2)
+        throw(ArgumentError("La position $label $position est en dehors de la carte."))
+    end
+    if !case_traversable(M[l, c])
+        throw(ArgumentError("La position $label $position est sur un obstacle."))
+    end
+end
+
+function preparer_recherche(fname::String, D::Tuple{Int,Int}, A::Tuple{Int,Int})
+    grid = lire_map(fname)
+    valider_position(grid, D, "de depart")
+    valider_position(grid, A, "d'arrivee")
+    return grid
 end
 
 function get_neighbors(M::Matrix{Char}, position::Tuple{Int,Int})
@@ -49,7 +77,7 @@ function get_neighbors(M::Matrix{Char}, position::Tuple{Int,Int})
       nl,nc=l+dl, c+dc
       if nl >= 1 && nl <= size(M,1) && nc >= 1 && nc <= size(M,2)
       #On verifie que la case est accessible(Donc on ne va ajouter que les cases accessibles dans la liste des voisins)
-         if M[nl,nc] =='.' || M[nl,nc]=='S' || M[nl,nc]=='W'
+         if case_traversable(M[nl,nc])
             push!(voisins,(nl,nc))
          end
      end
@@ -76,7 +104,7 @@ end
 #******************************************************************************************
 function algobfs(fname::String, D::Tuple{Int,Int}, A::Tuple{Int,Int})
     println("Breadth-First-Search")
-    grid=lire_map(fname)
+    grid=preparer_recherche(fname, D, A)
     queue=[D]
     visited=Set([D])
     parent = Dict{Tuple{Int,Int},Tuple{Int,Int}}()#Pour pouvoir reconstruire le chemin parcouru(On associera donc à chaque case son parent)
@@ -101,14 +129,14 @@ function algobfs(fname::String, D::Tuple{Int,Int}, A::Tuple{Int,Int})
         end
     end
     println("aucun chemin trouvé")
+    return []
 end
 
 # Algorithme de Dijkstra::************************************
 
-using DataStructures
  function algoDijkstra(fname::String, D::Tuple{Int,Int}, A::Tuple{Int,Int})
     println(" Dijkstra ")
-    grid=lire_map(fname)
+    grid=preparer_recherche(fname, D, A)
  
     #Initialisation des distances pour chaque position dans la grille
     dist=Dict{Tuple{Int,Int},Float64}()
@@ -130,6 +158,9 @@ visited = Set{Tuple{Int,Int}}()
 nb_evaluated=0
 while !isempty(pq)
     current= dequeue!(pq) 
+    if current in visited
+        continue
+    end
     nb_evaluated +=1
     
     if current == A
@@ -149,6 +180,9 @@ while !isempty(pq)
         if new_dist < dist[voisin]
             dist[voisin]=new_dist
             parent[voisin]=current
+            if haskey(pq, voisin)
+                delete!(pq, voisin)
+            end
             enqueue!(pq, voisin, new_dist)
         end
     end
@@ -169,7 +203,7 @@ end
 # f(D)=g(D)+h(D)=0+h(D)=h(D)
  
 function algoAstar(fname::String, D::Tuple{Int,Int}, A::Tuple{Int,Int})
-    grid=lire_map(fname)
+    grid=preparer_recherche(fname, D, A)
 
     #Initialisation des g et f pour chaque case
 
@@ -230,7 +264,7 @@ end
 
 #Algorithme Glouton ************************************************************
 function algoGlouton(fname::String, D::Tuple{Int,Int}, A::Tuple{Int,Int})
-    grid=lire_map(fname)
+    grid=preparer_recherche(fname, D, A)
     
     #PriorityQueue avec pour priorité la valeur Heuristique(heuristique de Manhattan)
    pq=PriorityQueue{Tuple{Int,Int}, Float64}()
@@ -273,27 +307,35 @@ end
 function calcul_f(pos::Tuple{Int,Int}, gpos::Float64, A::Tuple{Int,Int}; mode::Int,w::Float64)
     hpos = heuristique(pos, A)
     if mode == 1 
+     if w < 0 || w > 1
+        throw(ArgumentError("Pour mode=1, w doit etre compris entre 0 et 1."))
+     end
      #f(n) = w*g(n) + (1-w)*h(n), 0 <= w <=1
      return w*gpos + (1 - w)*hpos
-    else
+    elseif mode == 2 || mode == 3
+     if w < 1
+        throw(ArgumentError("Pour mode=$mode, w doit etre superieur ou egal a 1."))
+     end
      # mode=2 ou 3 : f(n) = g(n) + w*h(n), w >= 1
      return gpos + w*hpos
+    else
+     throw(ArgumentError("Mode A* pondere inconnu: $mode."))
     end
 end
 
 #Une fonction w_dynamique pour avoir w dynamique pour le 3eme cas ***********************************************************
 # Ici je choisi de diminuer w en fonction du nombre d'états évaluées
 
-function w_dynamique(voisin::Tuple{Int,Int}, nb_eval::Int, w_init::Float64)
+function w_dynamique(nb_eval::Int, w_init::Float64)
     # Plus le nombre d'états augmente plus w diminue(et w >= 1 )
-    new_w= 1+(w_init-1)*exp(-0.0001*nb_eval)
+    return max(1.0, 1 + (w_init - 1) * exp(-0.0001 * nb_eval))
 end
 
 #L'algorithme A* Ponderé************************************************************************************
 function algo_wAstar(fname::String,D::Tuple{Int,Int},A::Tuple{Int,Int};mode::Int, w::Float64)
   
     #Lecture de la carte  
-    grid = lire_map(fname)
+    grid = preparer_recherche(fname, D, A)
 
     #  g et f 
     g = Dict{Tuple{Int,Int}, Float64}()
@@ -344,7 +386,7 @@ function algo_wAstar(fname::String,D::Tuple{Int,Int},A::Tuple{Int,Int};mode::Int
             # Si mode=3, on recalcule w dynamiquement
             current_w = w
             if mode == 3
-                current_w = w_dynamique(voisin, nb_evaluated, w)
+                current_w = w_dynamique(nb_evaluated, w)
             end
 
             # Calcul du coût pour atteindre 'voisin'
