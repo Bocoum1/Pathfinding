@@ -1,33 +1,33 @@
-# Pathfinding in Julia
+# Pathfinding en Julia
 
-A Julia implementation of classical pathfinding algorithms on grid maps.
+Une implémentation en Julia d'algorithmes classiques de recherche de chemin sur des cartes représentées sous forme de grilles.
 
-The project reads map files, models obstacles and terrain costs, then compares several search strategies from uninformed search to heuristic search.
+Le projet lit des fichiers de cartes, modélise les obstacles et les coûts de terrain, puis compare plusieurs stratégies de recherche, de la recherche non informée à la recherche heuristique.
 
-## Implemented Algorithms
+## Algorithmes implémentés
 
 - Breadth-First Search
 - Dijkstra
 - A*
-- Greedy Best-First Search
-- Weighted A*
+- Recherche gloutonne
+- A* pondéré
 
-The implementation also includes utility functions for reading map files, computing movement costs, finding valid neighbors, reconstructing paths, and printing the resulting route.
+Le projet contient aussi les fonctions nécessaires pour lire une carte, calculer les coûts de déplacement, récupérer les voisins valides, reconstruire un chemin et afficher la route obtenue.
 
-## Map Model
+## Modèle de carte
 
-Maps are loaded from text files in `dat/`. The reader skips the file header until it finds the `map` line, then builds a character matrix.
+Les cartes sont chargées depuis le dossier `dat/`. Le lecteur ignore l'en-tête du fichier jusqu'à trouver la ligne `map`, puis construit une matrice de caractères.
 
-Supported terrain behavior:
+Comportement des terrains :
 
-- `@`: obstacle, not traversable
-- `.`: normal traversable cell, cost `1`
-- `S`: slower terrain, cost `5`
-- `W`: water-like terrain, cost `8`
+- `@` : obstacle non traversable
+- `.` : case traversable normale, coût `1`
+- `S` : terrain plus lent, coût `5`
+- `W` : terrain de type eau, coût `8`
 
-Movement is 4-directional: up, down, left, and right.
+Les déplacements se font dans 4 directions : haut, bas, gauche et droite.
 
-## Repository Structure
+## Structure du dépôt
 
 ```text
 .
@@ -39,34 +39,34 @@ Movement is 4-directional: up, down, left, and right.
     └── Path.jl
 ```
 
-## Requirements
+## Prérequis
 
 - Julia
 - `DataStructures.jl`
 
-Install the required package from the Julia REPL:
+Installer le package nécessaire depuis le REPL Julia :
 
 ```julia
 using Pkg
 Pkg.add("DataStructures")
 ```
 
-## Usage
+## Utilisation
 
-Clone the repository:
+Cloner le dépôt :
 
 ```bash
 git clone https://github.com/Bocoum1/Pathfinding.git
 cd Pathfinding
 ```
 
-Open Julia and load the source file:
+Ouvrir Julia et charger le fichier source :
 
 ```julia
 include("src/Path.jl")
 ```
 
-Run an algorithm on one of the bundled maps:
+Lancer un algorithme sur l'une des cartes fournies :
 
 ```julia
 start = (333, 14)
@@ -79,36 +79,36 @@ algoAstar(map_file, start, goal)
 algoGlouton(map_file, start, goal)
 ```
 
-Run Weighted A*:
+Lancer A* pondéré :
 
 ```julia
 algo_wAstar(map_file, start, goal; mode=2, w=1.5)
 ```
 
-## Weighted A* Modes
+## Modes de A* pondéré
 
-The `algo_wAstar` function supports several weighting strategies through `mode`:
+La fonction `algo_wAstar` accepte plusieurs stratégies de pondération via `mode` :
 
-- `mode=1`: weighted blend of path cost and heuristic
-- `mode=2`: `f(n) = g(n) + w * h(n)`
-- `mode=3`: dynamic weight that decreases as more states are evaluated
+- `mode=1` : mélange pondéré entre le coût du chemin et l'heuristique
+- `mode=2` : `f(n) = g(n) + w * h(n)`
+- `mode=3` : poids dynamique qui diminue lorsque le nombre d'états évalués augmente
 
-## Example Output
+## Sortie attendue
 
-Each algorithm prints:
+Chaque algorithme affiche :
 
-- the selected algorithm
-- the distance or path cost
-- the number of evaluated states
-- the reconstructed path as coordinates
+- l'algorithme utilisé
+- la distance ou le coût du chemin
+- le nombre d'états évalués
+- le chemin reconstruit sous forme de coordonnées
 
 ## Notes
 
-This project is focused on algorithmic clarity rather than UI or visualization. A natural next step would be to add benchmark tables and path visualizations for the bundled maps.
+Ce projet met surtout l'accent sur la clarté algorithmique. Il ne contient pas encore d'interface graphique ni de visualisation des chemins.
 
-## Roadmap
+## Prochaines améliorations
 
-- Add benchmark results comparing evaluated states and path costs.
-- Add image-based path visualization.
-- Add tests for map parsing and path reconstruction.
-- Package the code as a small Julia module.
+- Ajouter des tableaux de benchmark comparant les états évalués et les coûts obtenus.
+- Ajouter une visualisation des chemins sur les cartes.
+- Ajouter des tests pour le parsing des cartes et la reconstruction des chemins.
+- Transformer le code en petit module Julia.
